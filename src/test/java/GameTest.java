@@ -5,6 +5,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -14,12 +16,12 @@ import static org.mockito.Mockito.when;
  */
 class GameTest {
     private Game game;
+    private final Answer answer = new Answer("1 2 3 4");
 
     @BeforeEach
     void setUp() {
         AnswerGenerator stubAnswerGenerator = Mockito.mock(AnswerGenerator.class);
-        when(stubAnswerGenerator.generate()).thenReturn(new Answer("1 2 3 4"));
-
+        when(stubAnswerGenerator.generate()).thenReturn(answer);
         game = new Game(stubAnswerGenerator);
     }
 
@@ -52,4 +54,61 @@ class GameTest {
         Assertions.assertThrows(RuntimeException.class, () -> game.guess(new Answer("1 2 3 20")), "格式不正确:输入数字超出0-9范围");
     }
 
+    @Test
+    void should_get_history_right() {
+        game.guess(new Answer("1 5 6 7"));
+
+        List<GuessLog> list = game.getHistory();
+        assertThat(list.size()).isEqualTo(1);
+
+        GuessLog guessLog = list.get(0);
+        assertThat(guessLog.getGuessResult()).isEqualTo("1A0B");
+        assertThat(guessLog.getGuessAnswer()).isEqualTo(new Answer("1 5 6 7"));
+    }
+
+    @Test
+    void should_get_history_right_with_multiple_times() {
+        game.guess(new Answer("1 5 6 7"));
+        game.guess(new Answer("1 2 3 5"));
+        List<GuessLog> list = game.getHistory();
+        assertThat(list.size()).isEqualTo(2);
+
+        GuessLog guessLog = list.get(0);
+        assertThat(guessLog.getGuessResult()).isEqualTo("1A0B");
+        assertThat(guessLog.getGuessAnswer()).isEqualTo(new Answer("1 5 6 7"));
+
+        GuessLog guessLog1 = list.get(1);
+        assertThat(guessLog1.getGuessResult()).isEqualTo("3A0B");
+        assertThat(guessLog1.getGuessAnswer()).isEqualTo(new Answer("1 2 3 5"));
+    }
+
+    @Test
+    void should_return_win_when_guess_right() {
+        game.guess(new Answer("1 2 3 4"));
+        assertThat(game.getGameResult()).isEqualTo("win");
+    }
+
+    @Test
+    void should_play_failure_when_guess_wrong_with_six_times() {
+        guessSixTimes();
+
+        assertThat(game.getGameResult()).isEqualTo("failure");
+    }
+
+    @Test
+    void should_guess_over_when_guess_beyond_6_times_wrong() {
+        guessSixTimes();
+
+        Assertions.assertThrows(RuntimeException.class, () -> game.guess(new Answer("1 3 2 4"))
+                , "超过6次，不能再猜测");
+    }
+
+    private void guessSixTimes() {
+        game.guess(new Answer("1 3 2 4"));
+        game.guess(new Answer("1 3 2 4"));
+        game.guess(new Answer("1 3 2 4"));
+        game.guess(new Answer("1 3 2 4"));
+        game.guess(new Answer("1 3 2 4"));
+        game.guess(new Answer("1 3 2 4"));
+    }
 }

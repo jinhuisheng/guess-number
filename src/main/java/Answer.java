@@ -14,7 +14,7 @@ public class Answer {
         answerNumberList = Arrays.asList(answer.split(" "));
     }
 
-    Boolean check() {
+    Boolean checkValid() {
         if (answerNumberList.size() < Constant.ANSWER_NUMBER_LENGTH) {
             throw new RuntimeException("格式不正确:输入数字位数不够");
         }
@@ -50,4 +50,14 @@ public class Answer {
         return this.answerNumberList;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        Answer compareAnswer = (Answer) obj;
+        for (int i = 0; i < this.answerNumberList.size(); i++) {
+            if (!this.answerNumberList.get(i).equals(compareAnswer.answerNumberList.get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

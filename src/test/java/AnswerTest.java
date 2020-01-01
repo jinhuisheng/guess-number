@@ -6,11 +6,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author huisheng.jin
  * @date 2019/12/31.
  */
-public class AnswerGeneratorTest {
+class AnswerTest {
+
     @Test
-    void generate_right() {
-        Answer answer = new AnswerGenerator().generate();
-        Boolean result = answer.checkValid();
+    void should_return_true_when_answer_same() {
+        boolean result = new Answer("1 2 3 4").equals(new Answer("1 2 3 4"));
         assertThat(result).isEqualTo(true);
     }
 }

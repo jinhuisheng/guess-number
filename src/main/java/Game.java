@@ -60,8 +60,8 @@ public class Game {
         return result.equals(Constant.RIGHT_GUESS_RESULT);
     }
 
-    private boolean saveLog(Answer guessAnswer, String result) {
-        return history.add(new GuessLog(guessAnswer, result));
+    private void saveLog(Answer guessAnswer, String result) {
+        history.add(new GuessLog(guessAnswer, result));
     }
 
     public List<GuessLog> getHistory() {

@@ -18,8 +18,7 @@ public class Answer {
         if (answerNumberList.size() < Constant.ANSWER_NUMBER_LENGTH) {
             throw new RuntimeException("格式不正确:输入数字位数不够");
         }
-        Set<String> collect = new HashSet<>(answerNumberList);
-        if (collect.size() < Constant.ANSWER_NUMBER_LENGTH) {
+        if (getNumberCount() < Constant.ANSWER_NUMBER_LENGTH) {
             throw new RuntimeException("格式不正确:输入数字重复");
         }
         boolean beyondScope = answerNumberList.stream().anyMatch(number -> Integer.parseInt(number) >= 10);
@@ -27,6 +26,10 @@ public class Answer {
             throw new RuntimeException("格式不正确:输入数字超出0-9范围");
         }
         return true;
+    }
+
+    private int getNumberCount() {
+        return ((Set<String>) new HashSet<>(answerNumberList)).size();
     }
 
     String compare(Answer guessAnswer) {

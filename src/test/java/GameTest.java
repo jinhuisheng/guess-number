@@ -45,16 +45,6 @@ class GameTest {
     }
 
     @Test
-    void should_throw_exception_when_input_answer_number_not_enough() {
-        Assertions.assertThrows(RuntimeException.class, () -> game.guess(new Answer("1 1")), "格式不正确:输入数字位数不够");
-    }
-
-    @Test
-    void should_throw_exception_when_input_answer_number_beyond_scope() {
-        Assertions.assertThrows(RuntimeException.class, () -> game.guess(new Answer("1 2 3 20")), "格式不正确:输入数字超出0-9范围");
-    }
-
-    @Test
     void should_get_history_right() {
         game.guess(new Answer("1 5 6 7"));
 

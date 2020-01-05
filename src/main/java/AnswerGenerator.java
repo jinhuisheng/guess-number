@@ -1,37 +1,22 @@
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author huisheng.jin
- * @date 2019/12/31.
+ * @date 2020/1/5.
  */
 public class AnswerGenerator {
 
-    private static List<String> list = Arrays.asList("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+    private List<Integer> list = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     public Answer generate() {
-        List<String> chosenList = generateAnswerNumberList();
-        return new Answer(String.join(" ", chosenList));
-    }
-
-    private List<String> generateAnswerNumberList() {
-        List<String> chosenList = new ArrayList<>();
-        for (int i = 0; i < Constant.ANSWER_NUMBER_LENGTH; i++) {
-            Collections.shuffle(list);
-            String number = choseNumber(chosenList);
-            chosenList.add(number);
-        }
-        return chosenList;
-    }
-
-    private String choseNumber(List<String> chosenList) {
-        return list.stream()
-                .filter(listNum -> isNotExistInChosen(chosenList, listNum))
-                .findFirst()
-                .get();
-    }
-
-    private boolean isNotExistInChosen(List<String> chosenList, String listNum) {
-        return chosenList.stream()
-                .noneMatch(num -> num.equals(listNum));
+        Collections.shuffle(list);
+        String result = list.stream()
+                .limit(4)
+                .map(String::valueOf)
+                .collect(Collectors.joining(" "));
+        return new Answer(result);
     }
 }

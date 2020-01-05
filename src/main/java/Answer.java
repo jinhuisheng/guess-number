@@ -1,66 +1,74 @@
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static java.util.regex.Pattern.*;
 
 /**
  * @author huisheng.jin
- * @date 2019/12/31.
+ * @date 2020/1/5.
  */
 public class Answer {
-    private List<String> answerNumberList;
+    private String[] numberArray;
 
-    public Answer(String answer) {
-        answerNumberList = Arrays.asList(answer.split(" "));
+    public Answer(String answerInput) {
+        numberArray = answerInput.split(" ");
     }
 
-    Boolean checkValid() {
-        if (answerNumberList.size() < Constant.ANSWER_NUMBER_LENGTH) {
-            throw new RuntimeException("格式不正确:输入数字位数不够");
-        }
-        if (getNumberCount() < Constant.ANSWER_NUMBER_LENGTH) {
-            throw new RuntimeException("格式不正确:输入数字重复");
-        }
-        boolean beyondScope = answerNumberList.stream().anyMatch(number -> Integer.parseInt(number) >= 10);
-        if (beyondScope) {
-            throw new RuntimeException("格式不正确:输入数字超出0-9范围");
+    public boolean checkValid() {
+        boolean checkResult = isLengthValid() && isNumberNotRepeat() && isNumeric();
+        if (!checkResult) {
+            throw new IllegalArgumentException("输入参数不合法");
         }
         return true;
+
     }
 
-    private int getNumberCount() {
-        return ((Set<String>) new HashSet<>(answerNumberList)).size();
+    private Boolean isNumberNotRepeat() {
+        return Arrays.stream(numberArray).collect(Collectors.toSet()).size() == 4;
     }
 
-    String compare(Answer guessAnswer) {
-        int locationAndNumberRightCount = 0;
-        int locationRightCount = 0;
+    private boolean isLengthValid() {
+        return numberArray.length == 4;
+    }
 
-        List<String> guessAnswerNumberList = guessAnswer.getAnswerNumberList();
-        for (int i = 0; i < answerNumberList.size(); i++) {
-            if (guessAnswerNumberList.get(i).equals(answerNumberList.get(i))) {
-                locationAndNumberRightCount += 1;
-                continue;
-            }
-            if (answerNumberList.contains(guessAnswerNumberList.get(i))) {
-                locationRightCount += 1;
+    private boolean isNumeric() {
+        Pattern pattern = compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(String.join("", numberArray)).matches();
+    }
+
+    String getAnswer() {
+        return String.join(" ", numberArray);
+    }
+
+    String compare(Answer guessAnswerObj) {
+        String[] guessAnswerArray = guessAnswerObj.getNumberArray();
+
+        int rightNumberCount = getRightNumberCount(guessAnswerArray);
+        int wrongLocationCount = getWrongLocationCount(guessAnswerArray, rightNumberCount);
+
+        return rightNumberCount + "A" + wrongLocationCount + "B";
+    }
+
+    private String[] getNumberArray() {
+        return numberArray;
+    }
+
+    private int getWrongLocationCount(String[] guessAnswerArray, int rightNumberCount) {
+        int containsNumber = (int) Arrays.stream(guessAnswerArray)
+                .filter(number -> Arrays.asList(numberArray).contains(number))
+                .count();
+
+        return containsNumber - rightNumberCount;
+    }
+
+    private int getRightNumberCount(String[] guessAnswerArray) {
+        int rightNumberCount = 0;
+        for (int i = 0; i < this.numberArray.length; i++) {
+            if (this.numberArray[i].equals(guessAnswerArray[i])) {
+                rightNumberCount++;
             }
         }
-        return locationAndNumberRightCount + "A" + locationRightCount + "B";
-    }
-
-    private List<String> getAnswerNumberList() {
-        return this.answerNumberList;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        Answer compareAnswer = (Answer) obj;
-        for (int i = 0; i < this.answerNumberList.size(); i++) {
-            if (!this.answerNumberList.get(i).equals(compareAnswer.answerNumberList.get(i))) {
-                return false;
-            }
-        }
-        return true;
+        return rightNumberCount;
     }
 }

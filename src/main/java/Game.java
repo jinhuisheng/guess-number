@@ -1,74 +1,59 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author huisheng.jin
- * @date 2019/12/31.
+ * @date 2020/1/5.
  */
 public class Game {
+    private static final String RIGHT_GUESS_RESULT = "4A0B";
+    private static final int MAX_GUESS_TIMES = 6;
     private Answer answer;
-    private List<GuessLog> history;
+    private List<GuessLog> guessLogList;
     private String gameResult;
-    private Integer guessTimes;
 
     public Game(AnswerGenerator answerGenerator) {
         this.answer = answerGenerator.generate();
-        this.history = new ArrayList<>();
-        this.gameResult = "pending";
-        this.guessTimes = 0;
+        this.gameResult = "going";
+        this.guessLogList = new ArrayList<>();
     }
 
     public String guess(Answer guessAnswer) {
-        checkTimes();
         guessAnswer.checkValid();
-        String guessResult = compare(guessAnswer);
-        saveLog(guessAnswer, guessResult);
-        saveGuessTimes();
-        setGameResult(guessResult);
-        return guessResult;
+        checkGuessTimes();
+        String result = this.answer.compare(guessAnswer);
+        saveLog(guessAnswer.getAnswer(), result);
+        updateGameResult(result);
+        return result;
     }
 
-    private String compare(Answer guessAnswer) {
-        return answer.compare(guessAnswer);
-    }
-
-    private void saveGuessTimes() {
-        guessTimes += 1;
-    }
-
-    private void checkTimes() {
-        if (isReachMaxGuessTime()) {
-            throw new RuntimeException("超过6次，不能再猜测");
+    private void checkGuessTimes() {
+        if (guessLogList.size() == MAX_GUESS_TIMES) {
+            throw new BeyondGameGuessTimesException("超过游戏次数限制");
         }
     }
 
-    private void setGameResult(String result) {
-        if (isWin(result)) {
-            this.gameResult = "win";
-            return;
+    private void updateGameResult(String result) {
+        if (RIGHT_GUESS_RESULT.equals(result)) {
+            gameResult = "win";
         }
-        if (isReachMaxGuessTime()) {
-            this.gameResult = "failure";
+        if (guessLogList.size() == MAX_GUESS_TIMES) {
+            gameResult = "lose";
         }
     }
 
-    private boolean isReachMaxGuessTime() {
-        return guessTimes >= Constant.MAX_GUESS_TIMES;
-    }
-
-    private boolean isWin(String result) {
-        return result.equals(Constant.RIGHT_GUESS_RESULT);
-    }
-
-    private void saveLog(Answer guessAnswer, String result) {
-        history.add(new GuessLog(guessAnswer, result));
+    private void saveLog(String guessAnswer, String result) {
+        GuessLog guessLog = new GuessLog(guessAnswer, result);
+        guessLogList.add(guessLog);
     }
 
     public List<GuessLog> getHistory() {
-        return history;
+        return guessLogList;
     }
 
     public String getGameResult() {
         return gameResult;
     }
+
 }

@@ -1,21 +1,22 @@
 /**
  * @author huisheng.jin
- * @date 2019/12/31.
+ * @date 2020/1/5.
  */
 public class GuessLog {
+    private String guessAnswer;
     private String guessResult;
-    private Answer guessAnswer;
 
-    GuessLog(Answer guessAnswer, String guessResult) {
+    GuessLog(String guessAnswer, String guessResult) {
+
         this.guessAnswer = guessAnswer;
         this.guessResult = guessResult;
     }
 
-    public String getGuessResult() {
-        return guessResult;
+    public String getGuessAnswer() {
+        return guessAnswer;
     }
 
-    public Answer getGuessAnswer() {
-        return guessAnswer;
+    public String getGuessResult() {
+        return guessResult;
     }
 }
